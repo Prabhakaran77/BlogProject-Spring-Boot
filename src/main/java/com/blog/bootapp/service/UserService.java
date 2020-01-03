@@ -20,4 +20,20 @@ public class UserService {
         return repo.findById(id).get();
     }
 
+    public void save(User user)
+    {
+        repo.save(user);
+    }
+    public boolean newUserName(String UserName)
+    {
+        List<User> userList=listAll();
+        for(int i=0;i<userList.size();i++)
+        {
+            if(UserName.equals(userList.get(i).getName()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }
