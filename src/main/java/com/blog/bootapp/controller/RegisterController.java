@@ -1,7 +1,10 @@
 package com.blog.bootapp.controller;
 
+import com.blog.bootapp.BootappApplication;
 import com.blog.bootapp.model.User;
 import com.blog.bootapp.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -9,11 +12,14 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 @Controller
 public class RegisterController {
 
     @Autowired
     UserService us;
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(BootappApplication.class);
 
     @RequestMapping("/register")
     public String register()
@@ -36,6 +42,7 @@ public class RegisterController {
             String hpw=new BCryptPasswordEncoder().encode(password);
             user.setPassword(hpw);
             us.save(user);
+            LOGGER.trace("New user registerd with username:"+name);
             return "signUpMessage";
         }
         else

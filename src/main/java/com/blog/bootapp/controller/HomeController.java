@@ -1,6 +1,7 @@
 package com.blog.bootapp.controller;
 import java.util.ArrayList;
 
+import com.blog.bootapp.BootappApplication;
 import com.blog.bootapp.MyUserDetailService;
 import com.blog.bootapp.model.Category;
 import com.blog.bootapp.model.Post;
@@ -8,8 +9,12 @@ import com.blog.bootapp.model.User;
 import com.blog.bootapp.service.CategoryService;
 import com.blog.bootapp.service.PostService;
 import com.blog.bootapp.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -17,9 +22,8 @@ import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+
 
 @Controller
 public class HomeController {
@@ -30,16 +34,16 @@ public class HomeController {
     private CategoryService cs;
     @Autowired
     private UserService us;
-    @Autowired
-    private MyUserDetailService ms;
+
+
     private long updateID;
-    private int PAGE_SIZE =3;
-    boolean LOGIN=false;
-    boolean LOGOUT=true;
+    private final int PAGE_SIZE =3;
+    private final int CONTENT_DISPLAY_SIZE=300;
     private long totalPostsCount;
     private String currentUserName;
     private long author_id;
-
+    private String author;
+    private static final Logger LOGGER= LoggerFactory.getLogger(BootappApplication.class);
     private PageRequest gotoPage(int page)
     {
         PageRequest request = PageRequest.of(page,PAGE_SIZE);
@@ -47,7 +51,8 @@ public class HomeController {
     }
 
     @RequestMapping("/")
-    public String firstRequest(Model model,@RequestParam(value="pageNo", required=false, defaultValue = "0") String pageNo) {
+    public String firstRequest(Model model,@RequestParam(value="pageNo", required=false, defaultValue = "0") String pageNo)
+    {
         int lastPageNo;
         int gotoPageNo=Integer.parseInt(pageNo);
         List<Post> post=new ArrayList<>();
@@ -56,8 +61,8 @@ public class HomeController {
             post.add(p);
         }
         post.forEach(p-> {
-            if (p.getContent().length() >= 300) {
-                p.setContent(p.getContent().substring(0, 300) + "....");
+            if (p.getContent().length() >= CONTENT_DISPLAY_SIZE) {
+                p.setContent(p.getContent().substring(0, CONTENT_DISPLAY_SIZE) + "....");
             }
         });
         totalPostsCount=ps.count();
@@ -102,8 +107,8 @@ public class HomeController {
         if(totalPostsCount>0) {
              post = ps.findByIds(postIds, sortKeyWord, gotoPage(gotoPageNo)).getContent();
             post.forEach(p-> {
-                if (p.getContent().length() >= 300) {
-                    p.setContent(p.getContent().substring(0, 300) + "....");
+                if (p.getContent().length() >= CONTENT_DISPLAY_SIZE) {
+                    p.setContent(p.getContent().substring(0, CONTENT_DISPLAY_SIZE) + "....");
                 }
             });
         }
@@ -162,6 +167,16 @@ public class HomeController {
     @RequestMapping({"/read/{id}","/page/read/{id}"})
     public String openContent(@PathVariable("id") long id, ModelMap model)
     {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        currentUserName= authentication.getName();
+        List<User> userList = us.listAll();
+        author_id=ps.authorId(userList,currentUserName);
+        if(!ps.isPostExist(id))
+        {
+            LOGGER.warn(currentUserName+" tried to read a post which doesn't exist");
+            model.addAttribute("message","Post Doesn't Exist");
+            return "postDoesntExist";
+        }
         Post p = ps.get(id);
             model.addAttribute("post", p);
         return "content";
@@ -173,6 +188,12 @@ public class HomeController {
        currentUserName= authentication.getName();
        List<User> userList = us.listAll();
        author_id=ps.authorId(userList,currentUserName);
+        if(!ps.isPostExist(id))
+        {
+            LOGGER.warn(currentUserName+" tried to edit a post which doesn't exist");
+            model.addAttribute("message","Post Doesn't Exist");
+            return "postDoesntExist";
+        }
         Post post = ps.get(id);
         if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
             updateID = id;
@@ -188,6 +209,8 @@ public class HomeController {
         }
         else
         {
+            author=ps.authorName(userList,post.getAuthorId());
+            LOGGER.info("Author: "+currentUserName+" tried to edit "+author+"'s post'");
             model.addAttribute("message","you aren't authorized to edit or delete this post");
             return "unauthorized";
         }
@@ -221,6 +244,12 @@ public class HomeController {
         currentUserName= authentication.getName();
         List<User> userList = us.listAll();
         author_id=ps.authorId(userList,currentUserName);
+        if(!ps.isPostExist(id))
+        {
+            LOGGER.warn(currentUserName+" tried to delete a post which doesn't exist");
+            model.addAttribute("message","Post Doesn't Exist");
+            return "postDoesntExist";
+        }
         Post post = ps.get(id);
         if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
             model.addAttribute("id", id);
@@ -228,14 +257,10 @@ public class HomeController {
         }
         else
         {
+            LOGGER.info("info message Author: "+currentUserName+" tried to delete "+ps.authorName(userList,post.getAuthorId())+"'s post'");
+            LOGGER.info("Author: "+currentUserName+" tried to delete "+ps.authorName(userList,post.getAuthorId())+"'s post'");
             model.addAttribute("message","you aren't authorized to edit or delete this post");
             return "unauthorized";
         }
     }
-//    @RequestMapping("/login")
-//    public String login()
-//    {
-//        System.out.println("login entered");
-//        return "login";
-//    }
 }

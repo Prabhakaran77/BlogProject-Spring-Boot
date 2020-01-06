@@ -133,4 +133,22 @@ public class PostService {
         }
         return 0;
     }
+
+    public String authorName(List<User> userList,long id)
+    {
+        String name=null;
+        for(int i=0;i<userList.size();i++)
+        {
+            if(id==(userList.get(i).getUserId()))
+            {
+                name=userList.get(i).getName();
+            }
+        }
+        return name;
+    }
+
+    public  boolean isPostExist(long id)
+    {
+        return repo.existsById(id);
+    }
 }
