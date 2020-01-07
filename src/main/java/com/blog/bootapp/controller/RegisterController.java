@@ -1,7 +1,9 @@
 package com.blog.bootapp.controller;
 
 import com.blog.bootapp.BootappApplication;
+import com.blog.bootapp.model.Category;
 import com.blog.bootapp.model.User;
+import com.blog.bootapp.service.CategoryService;
 import com.blog.bootapp.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,9 @@ public class RegisterController {
 
     @Autowired
     UserService us;
+
+    @Autowired
+    CategoryService cs;
 
     private static final Logger LOGGER= LoggerFactory.getLogger(BootappApplication.class);
 
@@ -37,7 +42,7 @@ public class RegisterController {
             User user = new User();
             user.setEmail(email);
             user.setName(name);
-            user.setRoles("ROLE_author");
+            user.setRoles("ROLE_admin");
             user.setActive(true);
             String hpw=new BCryptPasswordEncoder().encode(password);
             user.setPassword(hpw);
@@ -51,4 +56,30 @@ public class RegisterController {
             return "SignUp";
         }
     }
+
+    @RequestMapping("/category")
+    public String category()
+    {
+        return "addcategory";
+    }
+
+    @RequestMapping("/newCat")
+    public String newCategory(ModelMap model,
+                         @RequestParam(value="catname", defaultValue = "") String name)
+    {
+        if(cs.catName(name)) {
+           Category cat=new Category();
+            cat.setName(name);
+            cs.save(cat);
+            LOGGER.trace("New Category type added ,Category name:"+name);
+            model.addAttribute("message","Category "+name+" added");
+            return "message";
+        }
+        else
+        {
+            model.addAttribute("exist","category already exist");
+            return "addcategory";
+        }
+    }
+
 }

@@ -192,7 +192,7 @@ public class HomeController {
         {
             LOGGER.warn(currentUserName+" tried to edit a post which doesn't exist");
             model.addAttribute("message","Post Doesn't Exist");
-            return "postDoesntExist";
+            return "message";
         }
         Post post = ps.get(id);
         if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
