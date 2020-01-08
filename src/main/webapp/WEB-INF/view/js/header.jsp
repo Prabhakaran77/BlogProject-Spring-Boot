@@ -1,9 +1,9 @@
-
-    <nav class="navbar  navbar-default navbar-fixed-top" role="navigation">
+<%@ page import="org.springframework.security.core.context.SecurityContextHolder" %>
+<%@ page import="org.springframework.security.core.Authentication" %>
+<nav class="navbar  navbar-default navbar-fixed-top" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
                     <span class="heading">
-                        <img src="logo.jpg" alt="BLOG">
 <%--                        Blog--%>
                      </span>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-main">
@@ -17,6 +17,14 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/">Home</a></li>
                     <li><a href="../addPost">Add Post</a></li>
+                    <% Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+                        if(authentication!= null && !("anonymousUser").equals(authentication.getName())) {  %>
+                    <li><a id="logout" href="/logout">Logout</a></li>
+                    <%  }
+                    else {  %>
+                    <li><a id="login" href="/login">Login</a></li>
+                    <li><a href="/register">Sign Up</a></li>
+                    <%  }   %>
                 </ul>
             </div>
         </div>

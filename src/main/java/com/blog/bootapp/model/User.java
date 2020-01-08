@@ -1,6 +1,7 @@
 package com.blog.bootapp.model;
 
 import org.hibernate.annotations.Proxy;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import javax.persistence.*;
 
@@ -22,6 +23,12 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false,columnDefinition = "text default 'ROLE_author'")
+    private String roles;
+
+    @Column(nullable = false,columnDefinition = "boolean default true")
+    private boolean active;
 
     public User(){
 
@@ -57,6 +64,22 @@ public class User extends BaseEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRoles() {
+        return roles;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public void setRoles(String roles) {
+        this.roles = roles;
     }
 }
 

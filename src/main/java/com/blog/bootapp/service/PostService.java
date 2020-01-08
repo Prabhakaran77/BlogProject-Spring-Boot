@@ -1,6 +1,7 @@
 package com.blog.bootapp.service;
 
 import com.blog.bootapp.controller.HomeController;
+import com.blog.bootapp.model.User;
 import com.blog.bootapp.repository.PostRepository;
 import com.blog.bootapp.model.Post;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,7 @@ public class PostService {
 
     public Post get(Long id)
     {
-        System.out.println("entered method");
         Post post=repo.getById(id);
-        System.out.println("b4 return");
         return post;
     }
 
@@ -57,7 +56,6 @@ public class PostService {
                 post= repo.findByIdsUAsc(postIds,req);
             else
                 post= repo.findByIdsUDesc(postIds,req);
-            System.out.println("Sort res:"+post);
         }
         else {
             post=repo.findByIdsCAsc(postIds,req);
@@ -68,15 +66,11 @@ public class PostService {
     public List<Long> allFilters(String name,long authId, long categId)
     {
         boolean ResultFound=true;
-        System.out.println("name is:"+name);
-        System.out.println("authId is:"+authId);
-        System.out.println("categId is:"+categId);
         List<Post> post=findAll();
         List<Post> temp;
         if(name!="")
         {
             temp=repo.findByTitleLike("%"+name+"%");
-            System.out.println("search result is:"+temp);
             if(!temp.isEmpty())
             {
                 post.retainAll(temp);
@@ -125,5 +119,18 @@ public class PostService {
     public long count()
     {
         return repo.count();
+    }
+
+
+    public long authorId(List<User> userList,String UserName)
+    {
+        for(int i=0;i<userList.size();i++)
+        {
+            if(UserName.equals(userList.get(i).getName()))
+            {
+                return userList.get(i).getUserId();
+            }
+        }
+        return 0;
     }
 }
