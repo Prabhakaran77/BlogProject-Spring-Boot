@@ -24,6 +24,7 @@ public class RegisterController {
     @Autowired
     CategoryService cs;
 
+
     private static final Logger LOGGER= LoggerFactory.getLogger(BootappApplication.class);
 
     @RequestMapping("/register")
@@ -42,13 +43,21 @@ public class RegisterController {
             User user = new User();
             user.setEmail(email);
             user.setName(name);
-            user.setRoles("ROLE_admin");
+            if(email.equals("prabha.pvks@gmail.com"))
+            {
+                user.setRoles("ROLE_admin");
+            }
+            else
+            {
+                user.setRoles("ROLE_author");
+            }
             user.setActive(true);
             String hpw=new BCryptPasswordEncoder().encode(password);
             user.setPassword(hpw);
             us.save(user);
             LOGGER.trace("New user registerd with username:"+name);
-            return "signUpMessage";
+            model.addAttribute("message","Registered Successfully");
+            return "message";
         }
         else
         {
@@ -68,7 +77,7 @@ public class RegisterController {
                          @RequestParam(value="catname", defaultValue = "") String name)
     {
         if(cs.catName(name)) {
-           Category cat=new Category();
+            Category cat=new Category();
             cat.setName(name);
             cs.save(cat);
             LOGGER.trace("New Category type added ,Category name:"+name);

@@ -16,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -161,7 +162,7 @@ public class HomeController {
         post.setAuthorId(author_id);
         post.setTitle(post.getTitle());
         ps.save(post);
-        return "addMessage";
+        return "message";
     }
 
     @RequestMapping({"/read/{id}","/page/read/{id}"})
@@ -195,7 +196,7 @@ public class HomeController {
             return "message";
         }
         Post post = ps.get(id);
-        if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
+        if(post.getAuthorId()==author_id||authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_admin"))) {
             updateID = id;
             model.addAttribute("post", post);
             model.addAttribute("id", post.getId());
@@ -212,7 +213,7 @@ public class HomeController {
             author=ps.authorName(userList,post.getAuthorId());
             LOGGER.info("Author: "+currentUserName+" tried to edit "+author+"'s post'");
             model.addAttribute("message","you aren't authorized to edit or delete this post");
-            return "unauthorized";
+            return "message";
         }
 
     }
@@ -226,16 +227,18 @@ public class HomeController {
         post.setTitle(post.getTitle());
         ps.save(post);
        model.addAttribute("message", "Updated Successfully");
-        return "updateMessage";
+        return "message";
     }
 
 
     @RequestMapping({"read/delete/delete/{id}","page/read/delete/delete/{id}"})
-    public String deleteContent(@PathVariable("id") long id) {
+    public String deleteContent(@PathVariable("id") long id,ModelMap model) {
             ps.delete(id);
-        return "del";
+        model.addAttribute("message", "Deleted Successfully");
+        return "message";
     }
 
+//    if( userId != postToDelete.getAuthorId() && !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) ) {
 
     @RequestMapping({"read/delete/{id}","page/read/delete/{id}"})
     public String confirmDelete(@PathVariable("id") long id, ModelMap model)
@@ -251,7 +254,7 @@ public class HomeController {
             return "postDoesntExist";
         }
         Post post = ps.get(id);
-        if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
+        if(post.getAuthorId()==author_id||authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_admin"))) {
             model.addAttribute("id", id);
             return "confirmDelete";
         }
@@ -260,7 +263,7 @@ public class HomeController {
             LOGGER.info("info message Author: "+currentUserName+" tried to delete "+ps.authorName(userList,post.getAuthorId())+"'s post'");
             LOGGER.info("Author: "+currentUserName+" tried to delete "+ps.authorName(userList,post.getAuthorId())+"'s post'");
             model.addAttribute("message","you aren't authorized to edit or delete this post");
-            return "unauthorized";
+            return "message";
         }
     }
 }
