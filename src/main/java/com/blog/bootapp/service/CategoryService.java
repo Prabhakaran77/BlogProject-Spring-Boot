@@ -27,4 +27,16 @@ public class CategoryService {
         repo.deleteById(id);
     }
 
+    public boolean catName(String CatName)
+    {
+        List<Category> catList=listAll();
+        for(int i=0;i<catList.size();i++)
+        {
+            if(CatName.equals(catList.get(i).getName()))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 }

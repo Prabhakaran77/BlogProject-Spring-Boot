@@ -25,6 +25,7 @@
                     <li><a id="login" href="/login">Login</a></li>
                     <li><a href="/register">Sign Up</a></li>
                     <%  }   %>
+                    <li><a href="/category">New Category</a></li>
                 </ul>
             </div>
         </div>
