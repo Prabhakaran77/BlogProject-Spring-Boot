@@ -16,6 +16,7 @@
     </style>
 </head>
 <body>
+<a href="/">Home</a>
 <form action="login" method="post">
 
     <div class="container">

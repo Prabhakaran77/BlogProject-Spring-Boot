@@ -5,6 +5,9 @@
     <link rel="stylesheet" href="/WEB-INF/view/css/index.css">
 </head>
 <body>
+<header>
+    <%@include file="js/header.jsp" %>
+</header>
             <h3 id="cd">Confirm Delete</h3>
             <p>
                 <a href="delete/${id}">YES</a><br>
