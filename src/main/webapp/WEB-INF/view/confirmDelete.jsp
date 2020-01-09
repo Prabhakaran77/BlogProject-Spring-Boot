@@ -7,7 +7,8 @@
 <body>
             <h3 id="cd">Confirm Delete</h3>
             <p>
-                <a href="delete/${id}">YES</a>
+                <a href="delete/${id}">YES</a><br>
+                <a href="/">NO</a>
             </p>
 </body>
 </html>

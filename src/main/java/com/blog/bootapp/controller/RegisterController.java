@@ -41,19 +41,13 @@ public class RegisterController {
             User user = new User();
             user.setEmail(email);
             user.setName(name);
-            if(email.equals("prabha.pvks@gmail.com"))
-            {
-                user.setRoles("ROLE_admin");
-            }
-            else
-            {
-                user.setRoles("ROLE_author");
-            }
+            user.setRoles("ROLE_author");
             user.setActive(true);
             String hpw=new BCryptPasswordEncoder().encode(password);
             user.setPassword(hpw);
             us.save(user);
-            return "signUpMessage";
+            model.addAttribute("message","Registered Successfully");
+            return "message";
         }
         else
         {

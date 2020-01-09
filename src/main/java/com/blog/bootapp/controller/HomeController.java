@@ -11,6 +11,7 @@ import com.blog.bootapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,8 +35,6 @@ public class HomeController {
     private MyUserDetailService ms;
     private long updateID;
     private int PAGE_SIZE =3;
-    boolean LOGIN=false;
-    boolean LOGOUT=true;
     private long totalPostsCount;
     private String currentUserName;
     private long author_id;
@@ -156,7 +155,7 @@ public class HomeController {
         post.setAuthorId(author_id);
         post.setTitle(post.getTitle());
         ps.save(post);
-        return "addMessage";
+        return "message";
     }
 
     @RequestMapping({"/read/{id}","/page/read/{id}"})
@@ -174,7 +173,7 @@ public class HomeController {
        List<User> userList = us.listAll();
        author_id=ps.authorId(userList,currentUserName);
         Post post = ps.get(id);
-        if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
+        if(post.getAuthorId()==author_id||authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_admin"))) {
             updateID = id;
             model.addAttribute("post", post);
             model.addAttribute("id", post.getId());
@@ -189,7 +188,7 @@ public class HomeController {
         else
         {
             model.addAttribute("message","you aren't authorized to edit or delete this post");
-            return "unauthorized";
+            return "message";
         }
 
     }
@@ -203,14 +202,15 @@ public class HomeController {
         post.setTitle(post.getTitle());
         ps.save(post);
        model.addAttribute("message", "Updated Successfully");
-        return "updateMessage";
+        return "message";
     }
 
 
     @RequestMapping({"read/delete/delete/{id}","page/read/delete/delete/{id}"})
-    public String deleteContent(@PathVariable("id") long id) {
+    public String deleteContent(@PathVariable("id") long id,Model model) {
             ps.delete(id);
-        return "del";
+        model.addAttribute("message", "Deleted Successfully");
+        return "message";
     }
 
 
@@ -222,20 +222,14 @@ public class HomeController {
         List<User> userList = us.listAll();
         author_id=ps.authorId(userList,currentUserName);
         Post post = ps.get(id);
-        if(post.getAuthorId()==author_id||currentUserName.equals("Admin")) {
+        if(post.getAuthorId()==author_id||authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_admin"))) {
             model.addAttribute("id", id);
             return "confirmDelete";
         }
         else
         {
             model.addAttribute("message","you aren't authorized to edit or delete this post");
-            return "unauthorized";
+            return "message";
         }
     }
-//    @RequestMapping("/login")
-//    public String login()
-//    {
-//        System.out.println("login entered");
-//        return "login";
-//    }
 }
