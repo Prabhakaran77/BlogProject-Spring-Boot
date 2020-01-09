@@ -15,12 +15,12 @@
             <div class="collapse navbar-collapse" id="navbar-collapse-main">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="/">Home</a></li>
-                    <li><a href="../addPost">Add Post</a></li>
                     <% Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
                         if(authentication!= null && !("anonymousUser").equals(authentication.getName())) {  %>
                     <li><a id="logout" href="/logout">Logout</a></li>
                     <%  }
                     else {  %>
+                    <li><a href="../addPost">Add Post</a></li>
                     <li><a id="login" href="/login">Login</a></li>
                     <li><a href="/register">Sign Up</a></li>
                     <%  }   %>
