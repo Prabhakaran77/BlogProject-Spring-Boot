@@ -13,7 +13,8 @@
 <body>
 
     <main>
-        <h1>${message}</h1>
+        <h1>${message}</h1><br>
+        <a href="/">Home</a>
     </main>
 
 </body>
