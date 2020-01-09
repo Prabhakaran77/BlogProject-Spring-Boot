@@ -4,7 +4,6 @@
         <div class="container-fluid">
             <div class="navbar-header">
                     <span class="heading">
-<%--                        Blog--%>
                      </span>
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse-main">
                     <span class="sr-only"> Toggle navigation</span>
